@@ -87,8 +87,8 @@ services:
     image: bde2020/spark-master:2.4.0-hadoop2.7
     container_name: spark-master
     ports:
-      - 8080:8080
-      - 7077:7077
+      - "8080:8080"
+      - "7077:7077"
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
     env_file:
@@ -109,7 +109,7 @@ services:
     depends_on:
       - spark-master
     ports:
-      - 8081:8081
+      - 8001:8001
     env_file:
       - ./hadoop-hive.env
     networks:
@@ -184,13 +184,45 @@ services:
       - "18630:18630"
     networks:
       net_pet:
-        ipv4_address: 172.27.1.17  
+        ipv4_address: 172.27.1.17
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: renatogroffe
+      ME_CONFIG_BASICAUTH_PASSWORD: MongoExpress2019!
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: MongoDB2019!
+    links:
+      - mongo
+    networks:
+      - mongo-compose-network
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: MongoDB2019!
+    ports:
+      - "27017:27017"
+    volumes:
+      - /home/renatogroffe/Desenvolvimento/Docker/Volumes/MongoDB:/data/db
+    networks:
+      - mongo-compose-network
 
 networks:
+  mongo-compose-network:
+    driver: bridge
   net_pet:
     ipam:
       driver: default
       config:
         - subnet: 172.27.0.0/16
+
+
+
 
 
